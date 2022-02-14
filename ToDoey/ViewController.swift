@@ -7,21 +7,68 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDelegate {
 
+    enum Section {
+        case first
+    }
+    
+    struct ToDoModel: Hashable {
+        let title: String
+    }
+    
+    var todos: [ToDoModel] = []
+    private let tableView = UITableView(frame: .zero)
+    var dataSource: UITableViewDiffableDataSource<Section, ToDoModel>!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureViewController()
+        configureTableView()
+        dataSource = UITableViewDiffableDataSource(tableView: tableView, cellProvider: { tableView, indexPath, model in
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            cell.textLabel?.text = model.title
+            return cell
+        })
         // Do any additional setup after loading the view.
     }
 
+    private func configureTableView() {
+        view.addSubview(tableView)
+        tableView.delegate = self
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        ])
+    }
     
-    func configureViewController() {
+    private func configureViewController() {
         view.backgroundColor = .systemBackground
         navigationController?.navigationBar.prefersLargeTitles = true
         title = "ToDoey"
+        let plusButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addToDo))
+        navigationItem.rightBarButtonItem = plusButton
+        
+    }
+    @objc func addToDo() {
+        print("Trying to add here")
+        #warning("present uialertcontroller here")
+        #warning("update data source here")
     }
     
+    func updateDatasource() {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, ToDoModel>()
+        snapshot.appendSections([.first])
+        snapshot.appendItems(todos)
+        
+        dataSource.apply(snapshot, animatingDifferences: true, completion: nil)
+    }
 }
+
 
