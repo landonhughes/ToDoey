@@ -20,19 +20,22 @@ class ViewController: UIViewController, UITableViewDelegate {
     var todos: [ToDoModel] = []
     private let tableView = UITableView(frame: .zero)
     var dataSource: UITableViewDiffableDataSource<Section, ToDoModel>!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         configureViewController()
         configureTableView()
+        configureDataSource()
+        
+    }
+
+    private func configureDataSource() {
         dataSource = UITableViewDiffableDataSource(tableView: tableView, cellProvider: { tableView, indexPath, model in
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
             cell.textLabel?.text = model.title
             return cell
         })
-        // Do any additional setup after loading the view.
     }
-
     private func configureTableView() {
         view.addSubview(tableView)
         tableView.delegate = self
@@ -57,11 +60,25 @@ class ViewController: UIViewController, UITableViewDelegate {
         
     }
     @objc func addToDo() {
-        print("Trying to add here")
-        #warning("present uialertcontroller here")
-        #warning("update data source here")
+        let alert = UIAlertController(title: "Add To-Do", message: "Whatcha need to do?", preferredStyle: .alert)
+        
+        alert.addTextField()
+        let addToDoAction = UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
+            let textField = alert.textFields![0]
+            if let empty = textField.text?.isEmpty {
+                if empty {
+                    return
+                }
+                self?.todos.append(ToDoModel(title: textField.text!))
+                self?.updateDatasource()
+            }
+        })
+        alert.addAction(addToDoAction)
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        self.present(alert, animated: true, completion: nil)
     }
-    
+
     func updateDatasource() {
         var snapshot = NSDiffableDataSourceSnapshot<Section, ToDoModel>()
         snapshot.appendSections([.first])
