@@ -13,3 +13,10 @@ The main concepts I want to touch on for this project are:
 - CoreData
 - Resolving Git conflicts with branches
 - Unit Testing
+
+
+
+**Edit:** As of 3/10/2022, this project is __completed__ . I will be learning about Unit Testing on my own time.
+The main thing is that this project is functional and works.
+
+Please feel free to clone this repo to learn about the UITableViewDiffableDataSource API and CoreData!
