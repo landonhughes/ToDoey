@@ -7,41 +7,34 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDelegate {
+class ViewController: UIViewController {
 
-    enum Section {
-        case first
-    }
-    
-    struct ToDoModel: Hashable {
-        let title: String
-    }
-    
-    var todos: [ToDoModel] = []
+    private var todos: [ToDoItem]!
     private let tableView = UITableView(frame: .zero)
-    var dataSource: UITableViewDiffableDataSource<Section, ToDoModel>!
-
+    private var todoDataSource: TodoDiffableDataSource!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        todos = StorageManager.shared.getAllItems()
+        configureDataSource()
+        createInitialSnapshot()
         configureViewController()
         configureTableView()
-        configureDataSource()
-        
     }
-
+    
     private func configureDataSource() {
-        dataSource = UITableViewDiffableDataSource(tableView: tableView, cellProvider: { tableView, indexPath, model in
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-            cell.textLabel?.text = model.title
-            return cell
-        })
+         todoDataSource = TodoDiffableDataSource(tableView: tableView, cellProvider: { tableView, indexPath, todoItem in
+             let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+             cell.textLabel?.text = todoItem.name
+             return cell
+         })
+        todoDataSource.delegate = self
     }
     private func configureTableView() {
         view.addSubview(tableView)
-        tableView.delegate = self
-        tableView.translatesAutoresizingMaskIntoConstraints = false
         
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -61,31 +54,44 @@ class ViewController: UIViewController, UITableViewDelegate {
     }
     @objc func addToDo() {
         let alert = UIAlertController(title: "Add To-Do", message: "Whatcha need to do?", preferredStyle: .alert)
-        
         alert.addTextField()
+        
         let addToDoAction = UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
+            guard let self = self else { return }
             let textField = alert.textFields![0]
-            if let empty = textField.text?.isEmpty {
-                if empty {
-                    return
-                }
-                self?.todos.append(ToDoModel(title: textField.text!))
-                self?.updateDatasource()
+            if textField.text!.trimmingCharacters(in: .whitespaces).isEmpty {
+                return
             }
+            StorageManager.shared.createItem(name: textField.text!)
+            self.updateDatasource()
         })
         alert.addAction(addToDoAction)
-        
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        
         self.present(alert, animated: true, completion: nil)
     }
 
-    func updateDatasource() {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, ToDoModel>()
+    private func createInitialSnapshot() {
+        var snapshot = todoDataSource.snapshot()
         snapshot.appendSections([.first])
         snapshot.appendItems(todos)
-        
-        dataSource.apply(snapshot, animatingDifferences: true, completion: nil)
+        todoDataSource.apply(snapshot, animatingDifferences: false, completion: nil)
     }
+    private func updateDatasource() {
+        var snapshot = todoDataSource.snapshot()
+        if let currentTodoItems = StorageManager.shared.getAllItems() {
+            snapshot.appendItems(currentTodoItems, toSection: .first)
+        }
+        todoDataSource.apply(snapshot, animatingDifferences: true, completion: nil)
+    }
+    
+
 }
 
-
+extension ViewController: Deletable {
+    func didDeleteOnSwipe(todoItem: ToDoItem) {
+        var snapshot = todoDataSource.snapshot()
+        snapshot.deleteItems([todoItem])
+        todoDataSource.apply(snapshot, animatingDifferences: true, completion: nil)
+    }
+}
