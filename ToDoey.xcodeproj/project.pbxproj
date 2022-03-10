@@ -87,7 +87,6 @@
 		DA38661A27B9BD8D00F668F2 = {
 			isa = PBXGroup;
 			children = (
-				DA95FC0227DA63810043A0B4 /* StorageManager.swift */,
 				DA95FC0127DA62A30043A0B4 /* Screens */,
 				DA95FC0027DA62880043A0B4 /* Support */,
 				DA95FBFF27DA602E0043A0B4 /* ToDoItem */,
@@ -113,7 +112,6 @@
 			children = (
 				DA38663727B9BD8F00F668F2 /* Info.plist */,
 				DA38663227B9BD8F00F668F2 /* Assets.xcassets */,
-				DAF4B31A27D951FC0010256F /* TodoDiffableDataSource.swift */,
 			);
 			path = ToDoey;
 			sourceTree = "<group>";
@@ -148,6 +146,8 @@
 		DA95FC0027DA62880043A0B4 /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				DAF4B31A27D951FC0010256F /* TodoDiffableDataSource.swift */,
+				DA95FC0227DA63810043A0B4 /* StorageManager.swift */,
 				DA38662627B9BD8D00F668F2 /* AppDelegate.swift */,
 				DA38662827B9BD8D00F668F2 /* SceneDelegate.swift */,
 			);
