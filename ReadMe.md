@@ -12,7 +12,6 @@ The main concepts I want to touch on for this project are:
 - AutoLayout
 - CoreData
 - Resolving Git conflicts with branches
-- Unit Testing
 
 
 
@@ -20,3 +19,7 @@ The main concepts I want to touch on for this project are:
 The main thing is that this project is functional and works.
 
 Please feel free to clone this repo to learn about the UITableViewDiffableDataSource API and CoreData!
+
+<img src="./1.png" alt="First" width="200px" />
+<img src="./2.png" alt="First" width="200px" />
+<img src="./3.png" alt="First" width="200px" />
